@@ -1,6 +1,6 @@
 {
     "name": "profane",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "A profanity detector.",
     "main": "lib/profane.js",
     "scripts": {
