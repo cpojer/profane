@@ -1,10 +1,10 @@
 {
     "name": "profane",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "A profanity detector.",
     "main": "lib/profane.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "nodeunit test/test.js"
     },
     "keywords": [
         "profanity"
@@ -12,8 +12,7 @@
     "author": "Will Riley",
     "license": "MIT",
     "dependencies": {
-        "lodash": "^4.12.0",
-        "swearjar": "^0.1.2"
+        "lodash": "^4.12.0"
     },
     "repository": {
         "type": "git",
@@ -21,5 +20,8 @@
     },
     "engines": {
         "node": "*"
+    },
+    "devDependencies": {
+        "nodeunit": "^0.9.1"
     }
 }
