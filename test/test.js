@@ -22,17 +22,19 @@ var _ = require('lodash');
     test.ifError(value)
 */
 
-exports.solemn = {
+exports.profane = {
     setUp: function(done) {
         // setup here if necessary
         this.p = new Profane();
         done();
     },
+
     loads_default_dictionary: function(test) {
         test.expect(1);
         test.ok(_.keys(this.p.getWords()).length > 0);
         test.done();
     },
+
     has_word: function(test) {
         test.expect(3);
         test.equals(this.p.hasWord("hell"), true);
@@ -40,33 +42,162 @@ exports.solemn = {
         test.equals(this.p.hasWord(undefined), false);
         test.done();
     },
-    check_for_words: function(test) {
-        test.expect(5);
-        var violations = [];
 
-        violations = this.p.checkForWords("bob");
-        test.equals(violations.length, 0);
-
-        violations = this.p.checkForWords("hell no dude");
-        test.equals(violations.length, 2);
-        test.ok(_.indexOf(violations, 'hell') > -1);
-        test.ok(_.indexOf(violations, 'dude') > -1);
-        test.ok(_.indexOf(violations, 'no') === -1);
+    add_word: function(test) {
+        test.expect(3);
+        var word = "1 1 1";
+        test.equals(this.p.hasWord(word), false);
+        this.p.addWord(word, ["inappropriate"]);
+        test.equals(this.p.hasWord(word), true);
+        test.equals(this.p.wordHasCategory(word, "inappropriate"), true);
         test.done();
     },
 
-    check_for_categories: function(test) {
+    remove_word: function(test) {
+        test.expect(2);
+        var word = "dude";
+        test.equals(this.p.hasWord(word), true);
+        this.p.removeWord(word);
+        test.equals(this.p.hasWord(word), false);
+        test.done();
+    },
+
+    clear_words: function(test) {
+        test.expect(2);
+        test.equals(_.keys(this.p.getWords()).length > 0, true);
+        this.p.clearWords();
+        test.equals(_.keys(this.p.getWords()).length === 0, true);
+        test.done();
+    },
+
+    word_has_category: function(test) {
+        test.expect(1);
+        test.equal(this.p.wordHasCategory("hell", "inappropriate"), true);
+        test.done();
+    },
+
+    add_categories_for_word: function(test) {
+        test.expect(5);
+        var categories = this.p.getCategoriesForWord("hell");
+        var catLength = categories.length;
+        test.equal(catLength, 2);
+
+        this.p.addCategoriesForWord("hell", ["a", "b", "c"])
+        categories = this.p.getCategoriesForWord("hell");
+        catLength = categories.length;
+        test.equal(catLength, 5);
+
+        test.ok(this.p.wordHasCategory("hell", "a"));
+        test.ok(this.p.wordHasCategory("hell", "b"));
+        test.ok(this.p.wordHasCategory("hell", "c"));
+
+        test.done();
+    },
+
+    set_categories_for_word: function(test) {
+        test.expect(5);
+        var categories = this.p.getCategoriesForWord("hell");
+        var catLength = categories.length;
+        test.equal(catLength, 2);
+
+        this.p.setCategoriesForWord("hell", ["a", "b", "c"])
+        categories = this.p.getCategoriesForWord("hell");
+        catLength = categories.length;
+        test.equal(catLength, 3);
+
+        test.ok(this.p.wordHasCategory("hell", "a"));
+        test.ok(this.p.wordHasCategory("hell", "b"));
+        test.ok(this.p.wordHasCategory("hell", "c"));
+
+        test.done();
+    },
+
+    remove_categories_for_word: function(test) {
+        test.expect(4);
+        var categories = this.p.getCategoriesForWord("hell");
+        var catLength = categories.length;
+        test.equal(catLength, 2);
+
+        this.p.removeCategoriesForWord("hell", ["inappropriate"])
+        categories = this.p.getCategoriesForWord("hell");
+        catLength = categories.length;
+        test.equal(catLength, 1);
+
+        test.ok(!this.p.wordHasCategory("hell", "inappropriate"));
+        test.ok(this.p.wordHasCategory("hell", "religious"));
+
+        test.done();
+    },
+
+    get_words: function(test) {
+        test.expect(2);
+        var words = this.p.getWords();
+        test.equals(_.keys(words).length > 0, true);
+        var categories = words['hell'];
+        test.equals(categories.length > 0, true);
+        test.done();
+    },
+
+    get_word_counts: function(test) {
+        test.expect(5);
+        var wordCounts = {};
+        wordCounts = this.p.getWordCounts("bob");
+        test.equals(_.keys(wordCounts).length, 0);
+        wordCounts = this.p.getWordCounts("hell no dude");
+        test.equals(_.keys(wordCounts).length, 2);
+        test.equals(wordCounts['hell'], 1);
+        test.equals(wordCounts['dude'], 1);
+        test.ok(!('no' in wordCounts));
+        test.done();
+    },
+
+    get_category_counts: function(test) {
         test.expect(5);
         var categories = {};
-
-        categories = this.p.checkForCategories("bob");
+        categories = this.p.getCategoryCounts("bob");
         test.equals(_.keys(categories).length, 0);
-
-        categories = this.p.checkForCategories("hell no dude");
+        categories = this.p.getCategoryCounts("hell no dude");
         test.equals(_.keys(categories).length, 3);
         test.equals(categories['inappropriate'], 1);
         test.equals(categories['informal'], 1);
         test.equals(categories['religious'], 1);
         test.done();
     },
+
+    text_is_bad: function(test) {
+        test.expect(2);
+        test.ok(!this.p.textIsBad("good text"));
+        test.ok(this.p.textIsBad("real fucking bad text"));
+        test.done();
+    },
+
+    load_words: function(test) {
+        test.expect(5);
+        this.p.clearWords();
+        test.equal(_.keys(this.p.getWords()).length, 0);
+        this.p.loadWords('test/fixtures/dictionary.json');
+        test.equal(_.keys(this.p.getWords()).length, 2);
+        test.ok(this.p.hasWord("dude"));
+        test.ok(this.p.hasWord("babe"));
+        test.ok(this.p.wordHasCategory("babe", "sexist"));
+        test.done();
+    },
+
+    load_words_from_dictionary_object: function(test) {
+        var dictionary = {
+            "dude": ["inappropriate"],
+            "babe": ["inappropriate", "sexist"]
+        };
+
+        test.expect(5);
+        this.p.clearWords();
+        test.equal(_.keys(this.p.getWords()).length, 0);
+        this.p.loadWordsFromDictionaryObject(dictionary);
+        test.equal(_.keys(this.p.getWords()).length, 2);
+        test.ok(this.p.hasWord("dude"));
+        test.ok(this.p.hasWord("babe"));
+        test.ok(this.p.wordHasCategory("babe", "sexist"));
+        test.done();
+    }
+
 };
