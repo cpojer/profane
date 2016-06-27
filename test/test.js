@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Profane = require('profane');
+var Profane = require('../lib/profane');
 var _ = require('lodash');
 
 /*
@@ -143,9 +143,9 @@ exports.profane = {
         var wordCounts = {};
         wordCounts = this.p.getWordCounts("bob");
         test.equals(_.keys(wordCounts).length, 0);
-        wordCounts = this.p.getWordCounts("hell no dude");
+        wordCounts = this.p.getWordCounts("hellHellhell hell no dude");
         test.equals(_.keys(wordCounts).length, 2);
-        test.equals(wordCounts['hell'], 1);
+        test.equals(wordCounts['hell'], 4);
         test.equals(wordCounts['dude'], 1);
         test.ok(!('no' in wordCounts));
         test.done();
@@ -156,11 +156,11 @@ exports.profane = {
         var categories = {};
         categories = this.p.getCategoryCounts("bob");
         test.equals(_.keys(categories).length, 0);
-        categories = this.p.getCategoryCounts("hell no dude");
+        categories = this.p.getCategoryCounts("hellHellhell hell no dude");
         test.equals(_.keys(categories).length, 3);
-        test.equals(categories['inappropriate'], 1);
+        test.equals(categories['inappropriate'], 4);
         test.equals(categories['informal'], 1);
-        test.equals(categories['religious'], 1);
+        test.equals(categories['religious'], 4);
         test.done();
     },
 
