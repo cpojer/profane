@@ -1,13 +1,14 @@
 # profane
+
 A profanity detector.
 
 ## Usage
-```js
 
-var Profane = require('profane');
+```js
+var Profane = require("profane");
 var p = new Profane();
 
-// get the set of all inappropriate words in a string
+// get the set of all inappropriate words in a string (case insensitive and includes partial matches by default)
 var wordCounts = p.getWordCounts("hell no dude");
 console.log(wordCounts);
 
@@ -46,7 +47,6 @@ console.log(wordCounts);
 }
 */
 
-
 if (p.wordHasCategory("nasty", "gross")) {
   console.log("This will be printed");
 }
@@ -67,5 +67,31 @@ p.addCategoriesForWord("hell", ["inappropriate"]);
 p.removeCategoriesForWord("hell", ["religious"]);
 p.setCategoriesForWord("hell", ["inappropriate", "religious"]);
 
+/*
+get word counts without partial matching by using whole word matching
+*/
 
+p.setUseWholeWordMatch(true);
+var wordCounts = p.getWordCounts("shell no dude hellhell hello");
+console.log(wordCounts);
+
+/*
+
+{
+  'dude': 1,
+}
+
+*/
+
+var wordCounts = p.getWordCounts("shell no dude hellhell hello HELL");
+console.log(wordCounts);
+
+/*
+
+{
+  'hell': 1,
+  'dude': 1,
+}
+
+*/
 ```

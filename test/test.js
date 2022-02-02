@@ -1,203 +1,209 @@
-var fs = require('fs');
-var Profane = require('../lib/profane');
-var _ = require('lodash');
+import fs from "fs";
+import Profane from "../lib/profane.js";
+import _ from "lodash";
+import test from "ava";
 
-/*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
+test.beforeEach((t) => {
+  // This runs before each test
+  t.context.p = new Profane();
+});
 
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
-*/
+test("loads_default_dictionary", (t) => {
+  t.plan(1);
+  t.true(_.keys(t.context.p.getWords()).length > 0);
+});
 
-exports.profane = {
-    setUp: function(done) {
-        // setup here if necessary
-        this.p = new Profane();
-        done();
-    },
+test("has_word", (t) => {
+  t.plan(3);
+  t.true(t.context.p.hasWord("hell"));
+  t.false(t.context.p.hasWord("1 1 1"));
+  t.false(t.context.p.hasWord(undefined));
+});
 
-    loads_default_dictionary: function(test) {
-        test.expect(1);
-        test.ok(_.keys(this.p.getWords()).length > 0);
-        test.done();
-    },
+test("add_word", (t) => {
+  t.plan(3);
+  const word = "1 1 1";
+  t.false(t.context.p.hasWord(word));
+  t.context.p.addWord(word, ["inappropriate"]);
+  t.true(t.context.p.hasWord(word));
+  t.true(t.context.p.wordHasCategory(word, "inappropriate"));
+});
 
-    has_word: function(test) {
-        test.expect(3);
-        test.equals(this.p.hasWord("hell"), true);
-        test.equals(this.p.hasWord("1 1 1"), false);
-        test.equals(this.p.hasWord(undefined), false);
-        test.done();
-    },
+test("remove_word", (t) => {
+  t.plan(2);
+  const word = "dude";
+  t.true(t.context.p.hasWord(word));
+  t.context.p.removeWord(word);
+  t.false(t.context.p.hasWord(word));
+});
 
-    add_word: function(test) {
-        test.expect(3);
-        var word = "1 1 1";
-        test.equals(this.p.hasWord(word), false);
-        this.p.addWord(word, ["inappropriate"]);
-        test.equals(this.p.hasWord(word), true);
-        test.equals(this.p.wordHasCategory(word, "inappropriate"), true);
-        test.done();
-    },
+test("clear_words", (t) => {
+  t.plan(2);
+  t.true(_.keys(t.context.p.getWords()).length > 0);
+  t.context.p.clearWords();
+  t.true(_.keys(t.context.p.getWords()).length === 0);
+});
 
-    remove_word: function(test) {
-        test.expect(2);
-        var word = "dude";
-        test.equals(this.p.hasWord(word), true);
-        this.p.removeWord(word);
-        test.equals(this.p.hasWord(word), false);
-        test.done();
-    },
+test("word_has_category", (t) => {
+  t.plan(1);
+  t.true(t.context.p.wordHasCategory("hell", "inappropriate"));
+});
 
-    clear_words: function(test) {
-        test.expect(2);
-        test.equals(_.keys(this.p.getWords()).length > 0, true);
-        this.p.clearWords();
-        test.equals(_.keys(this.p.getWords()).length === 0, true);
-        test.done();
-    },
+test("add_categories_for_word", (t) => {
+  t.plan(5);
+  var categories = t.context.p.getCategoriesForWord("hell");
+  var catLength = categories.length;
+  t.is(catLength, 2);
 
-    word_has_category: function(test) {
-        test.expect(1);
-        test.equal(this.p.wordHasCategory("hell", "inappropriate"), true);
-        test.done();
-    },
+  t.context.p.addCategoriesForWord("hell", ["a", "b", "c"]);
+  categories = t.context.p.getCategoriesForWord("hell");
+  catLength = categories.length;
+  t.is(catLength, 5);
 
-    add_categories_for_word: function(test) {
-        test.expect(5);
-        var categories = this.p.getCategoriesForWord("hell");
-        var catLength = categories.length;
-        test.equal(catLength, 2);
+  t.true(t.context.p.wordHasCategory("hell", "a"));
+  t.true(t.context.p.wordHasCategory("hell", "b"));
+  t.true(t.context.p.wordHasCategory("hell", "c"));
+});
 
-        this.p.addCategoriesForWord("hell", ["a", "b", "c"])
-        categories = this.p.getCategoriesForWord("hell");
-        catLength = categories.length;
-        test.equal(catLength, 5);
+test("set_categories_for_word", (t) => {
+  t.plan(5);
+  var categories = t.context.p.getCategoriesForWord("hell");
+  var catLength = categories.length;
+  t.is(catLength, 2);
 
-        test.ok(this.p.wordHasCategory("hell", "a"));
-        test.ok(this.p.wordHasCategory("hell", "b"));
-        test.ok(this.p.wordHasCategory("hell", "c"));
+  t.context.p.setCategoriesForWord("hell", ["a", "b", "c"]);
+  categories = t.context.p.getCategoriesForWord("hell");
+  catLength = categories.length;
+  t.is(catLength, 3);
 
-        test.done();
-    },
+  t.true(t.context.p.wordHasCategory("hell", "a"));
+  t.true(t.context.p.wordHasCategory("hell", "b"));
+  t.true(t.context.p.wordHasCategory("hell", "c"));
+});
 
-    set_categories_for_word: function(test) {
-        test.expect(5);
-        var categories = this.p.getCategoriesForWord("hell");
-        var catLength = categories.length;
-        test.equal(catLength, 2);
+test("remove_categories_for_word", (t) => {
+  t.plan(4);
+  var categories = t.context.p.getCategoriesForWord("hell");
+  var catLength = categories.length;
+  t.is(catLength, 2);
 
-        this.p.setCategoriesForWord("hell", ["a", "b", "c"])
-        categories = this.p.getCategoriesForWord("hell");
-        catLength = categories.length;
-        test.equal(catLength, 3);
+  t.context.p.removeCategoriesForWord("hell", ["inappropriate"]);
+  categories = t.context.p.getCategoriesForWord("hell");
+  catLength = categories.length;
+  t.is(catLength, 1);
 
-        test.ok(this.p.wordHasCategory("hell", "a"));
-        test.ok(this.p.wordHasCategory("hell", "b"));
-        test.ok(this.p.wordHasCategory("hell", "c"));
+  t.true(!t.context.p.wordHasCategory("hell", "inappropriate"));
+  t.true(t.context.p.wordHasCategory("hell", "religious"));
+});
 
-        test.done();
-    },
+test("get_words", (t) => {
+  t.plan(2);
+  const words = t.context.p.getWords();
+  t.true(_.keys(words).length > 0);
+  const categories = words["hell"];
+  t.true(categories.length > 0);
+});
 
-    remove_categories_for_word: function(test) {
-        test.expect(4);
-        var categories = this.p.getCategoriesForWord("hell");
-        var catLength = categories.length;
-        test.equal(catLength, 2);
+test("get_word_counts without using whole word match", (t) => {
+  t.plan(5);
+  var wordCounts = t.context.p.getWordCounts("bob");
+  t.is(_.keys(wordCounts).length, 0);
+  wordCounts = t.context.p.getWordCounts("hellHellhell hell no dude");
+  t.is(_.keys(wordCounts).length, 2);
+  t.is(wordCounts["hell"], 4);
+  t.is(wordCounts["dude"], 1);
+  t.true(!("no" in wordCounts));
+});
 
-        this.p.removeCategoriesForWord("hell", ["inappropriate"])
-        categories = this.p.getCategoriesForWord("hell");
-        catLength = categories.length;
-        test.equal(catLength, 1);
+test("get_word_counts using whole word match", (t) => {
+  t.plan(5);
+  t.context.p.setUseWholeWordMatch(true);
+  var wordCounts = t.context.p.getWordCounts("bob");
+  t.is(_.keys(wordCounts).length, 0);
+  wordCounts = t.context.p.getWordCounts(
+    "hellHellhell hell nohell nohello hELl dude hello dudey no edude edudes"
+  );
+  t.is(_.keys(wordCounts).length, 2);
+  t.is(wordCounts["hell"], 2);
+  t.is(wordCounts["dude"], 1);
+  t.true(!("no" in wordCounts));
+});
 
-        test.ok(!this.p.wordHasCategory("hell", "inappropriate"));
-        test.ok(this.p.wordHasCategory("hell", "religious"));
+test("get_category_counts without using whole word match", (t) => {
+  t.plan(5);
+  var categories = t.context.p.getCategoryCounts("bob");
+  t.is(_.keys(categories).length, 0);
+  categories = t.context.p.getCategoryCounts("hellHellhell hell no dude");
+  t.is(_.keys(categories).length, 3);
+  t.is(categories["inappropriate"], 4);
+  t.is(categories["informal"], 1);
+  t.is(categories["religious"], 4);
+});
 
-        test.done();
-    },
+test("get_category_counts using whole word match", (t) => {
+  t.plan(5);
+  t.context.p.setUseWholeWordMatch(true);
+  var categories = t.context.p.getCategoryCounts("bob");
+  t.is(_.keys(categories).length, 0);
+  categories = t.context.p.getCategoryCounts(
+    "hellHellhell hell nohell nohello hELl dude hello dudey no edude edudes"
+  );
+  t.is(_.keys(categories).length, 3);
+  t.is(categories["inappropriate"], 2);
+  t.is(categories["informal"], 1);
+  t.is(categories["religious"], 2);
+});
 
-    get_words: function(test) {
-        test.expect(2);
-        var words = this.p.getWords();
-        test.equals(_.keys(words).length > 0, true);
-        var categories = words['hell'];
-        test.equals(categories.length > 0, true);
-        test.done();
-    },
+test("text_is_bad without using whole word match", (t) => {
+  t.plan(3);
+  t.context.p.setUseWholeWordMatch(true);
+  t.false(t.context.p.textIsBad("good text"));
+  t.true(t.context.p.textIsBad("real fucking bad text"));
+  t.false(t.context.p.textIsBad("real sfucking bad text"));
+});
 
-    get_word_counts: function(test) {
-        test.expect(5);
-        var wordCounts = {};
-        wordCounts = this.p.getWordCounts("bob");
-        test.equals(_.keys(wordCounts).length, 0);
-        wordCounts = this.p.getWordCounts("hellHellhell hell no dude");
-        test.equals(_.keys(wordCounts).length, 2);
-        test.equals(wordCounts['hell'], 4);
-        test.equals(wordCounts['dude'], 1);
-        test.ok(!('no' in wordCounts));
-        test.done();
-    },
+test("text_is_bad using whole word match", (t) => {
+  t.plan(3);
+  t.false(t.context.p.textIsBad("good text"));
+  t.true(t.context.p.textIsBad("real fucking bad text"));
+  t.true(t.context.p.textIsBad("real sfucking bad text"));
+});
 
-    get_category_counts: function(test) {
-        test.expect(5);
-        var categories = {};
-        categories = this.p.getCategoryCounts("bob");
-        test.equals(_.keys(categories).length, 0);
-        categories = this.p.getCategoryCounts("hellHellhell hell no dude");
-        test.equals(_.keys(categories).length, 3);
-        test.equals(categories['inappropriate'], 4);
-        test.equals(categories['informal'], 1);
-        test.equals(categories['religious'], 4);
-        test.done();
-    },
+test("get_use_whole_word_match by default should be false", (t) => {
+  t.plan(1);
+  t.false(t.context.p.getUseWholeWordMatch());
+});
 
-    text_is_bad: function(test) {
-        test.expect(2);
-        test.ok(!this.p.textIsBad("good text"));
-        test.ok(this.p.textIsBad("real fucking bad text"));
-        test.done();
-    },
+test("set_use_whole_word_match", (t) => {
+  t.plan(2);
+  t.false(t.context.p.getUseWholeWordMatch());
+  t.context.p.setUseWholeWordMatch(true);
+  t.true(t.context.p.getUseWholeWordMatch());
+});
 
-    load_words: function(test) {
-        test.expect(5);
-        this.p.clearWords();
-        test.equal(_.keys(this.p.getWords()).length, 0);
-        this.p.loadWords('test/fixtures/dictionary.json');
-        test.equal(_.keys(this.p.getWords()).length, 2);
-        test.ok(this.p.hasWord("dude"));
-        test.ok(this.p.hasWord("babe"));
-        test.ok(this.p.wordHasCategory("babe", "sexist"));
-        test.done();
-    },
+test("load_words", (t) => {
+  t.plan(5);
+  t.context.p.clearWords();
+  t.is(_.keys(t.context.p.getWords()).length, 0);
+  t.context.p.loadWords("test/fixtures/dictionary.json");
+  t.is(_.keys(t.context.p.getWords()).length, 2);
+  t.true(t.context.p.hasWord("dude"));
+  t.true(t.context.p.hasWord("babe"));
+  t.true(t.context.p.wordHasCategory("babe", "sexist"));
+});
 
-    load_words_from_dictionary_object: function(test) {
-        var dictionary = {
-            "dude": ["inappropriate"],
-            "babe": ["inappropriate", "sexist"]
-        };
+test("load_words_from_dictionary_object", (t) => {
+  var dictionary = {
+    dude: ["inappropriate"],
+    babe: ["inappropriate", "sexist"],
+  };
 
-        test.expect(5);
-        this.p.clearWords();
-        test.equal(_.keys(this.p.getWords()).length, 0);
-        this.p.loadWordsFromDictionaryObject(dictionary);
-        test.equal(_.keys(this.p.getWords()).length, 2);
-        test.ok(this.p.hasWord("dude"));
-        test.ok(this.p.hasWord("babe"));
-        test.ok(this.p.wordHasCategory("babe", "sexist"));
-        test.done();
-    }
-
-};
+  t.plan(5);
+  t.context.p.clearWords();
+  t.is(_.keys(t.context.p.getWords()).length, 0);
+  t.context.p.loadWordsFromDictionaryObject(dictionary);
+  t.is(_.keys(t.context.p.getWords()).length, 2);
+  t.true(t.context.p.hasWord("dude"));
+  t.true(t.context.p.hasWord("babe"));
+  t.true(t.context.p.wordHasCategory("babe", "sexist"));
+});
