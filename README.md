@@ -1,97 +1,122 @@
-# profane
+# @cnakazawa/profane
 
-A profanity detector.
+Zero dependency profanity detector based on [Swearjar](https://github.com/raymondjavaxx/swearjar-node) and [Profane](https://github.com/willynilly/profane).
+
+_Note: Some examples may contain offensive language for illustration purposes._
+
+## install
+
+```
+npm install @cnakazawa/profane
+```
 
 ## Usage
 
+### `new Profane(`[`options?`](#options)`)`
+
+Create a new instance:
+
 ```js
-var Profane = require("profane");
-var p = new Profane();
+import Profane from 'profane';
 
-// get the set of all inappropriate words in a string (case insensitive and includes partial matches by default)
-var wordCounts = p.getWordCounts("hell no dude");
-console.log(wordCounts);
-
-/*
-
-{
-  'hell': 1,
-  'dude': 1,
-}
-
-*/
-
-// get an associative array of all of categories found,
-// where the key is the category and the value is the number
-// of words found for that category
-var categoryCounts = p.getCategoryCounts("hell no dude");
-console.log(categoryCounts);
-
-/*
-
-{
-  'inappropriate': 1,
-  'informal': 1,
-  'religious': 1,
-}
-
-*/
-
-p.addWord("nasty", ["inappropriate", "gross"]);
-wordCounts = p.getWordCounts("you are nasty");
-console.log(wordCounts);
-
-/*
-{
-  'nasty': 1,
-}
-*/
-
-if (p.wordHasCategory("nasty", "gross")) {
-  console.log("This will be printed");
-}
-
-p.removeWord("nasty");
-
-if (p.hasWord("nasty")) {
-  console.log("This won't be printed");
-}
-
-p.clearWords();
-if (p.hasWord("hell")) {
-  console.log("This won't be printed");
-}
-
-p.addWord("hell", ["religious"]);
-p.addCategoriesForWord("hell", ["inappropriate"]);
-p.removeCategoriesForWord("hell", ["religious"]);
-p.setCategoriesForWord("hell", ["inappropriate", "religious"]);
-
-/*
-get word counts without partial matching by using whole word matching
-*/
-
-p.setUseWholeWordMatch(true);
-var wordCounts = p.getWordCounts("shell no dude hellhell hello");
-console.log(wordCounts);
-
-/*
-
-{
-  'dude': 1,
-}
-
-*/
-
-var wordCounts = p.getWordCounts("shell no dude hellhell hello HELL");
-console.log(wordCounts);
-
-/*
-
-{
-  'hell': 1,
-  'dude': 1,
-}
-
-*/
+const profane = new Profane();
 ```
+
+### `check(text: string): boolean`
+
+Check if a text matches the word list:
+
+```js
+profance.check('Hell no'); // true
+profance.check('H3ll no'); // true
+profane.check('Banana Banana Banana'); // false
+```
+
+### `censor(censored: string, replacement?: string): string;`
+
+Censor words matching the word list:
+
+```js
+profane.censor('Hell no'); // '**** no'
+profane.censor('Hell no', '•'); // '•••• no'
+```
+
+### `getWordFrequencies(text: string): Record<string, number>;`
+
+Get the word frequencies of words matching the word list:
+
+````js
+
+```js
+const frequencies = profane.getWordFrequencies('horniest hornet fart');
+````
+
+```json
+{
+  "horniest": 1,
+  "fart": 1
+}
+```
+
+### `getCategoryFrequencies(text: string): Record<string, number>;`
+
+Get the category frequencies of words matching the word list:
+
+```js
+const frequencies = profane.getCategoryFrequencies('horniest hornet fart');
+```
+
+```json
+{
+  "inappropriate": 1,
+  "sexual": 1
+}
+```
+
+## Options
+
+### `words: Record<string, ReadonlyArray<string>>`
+
+You can configure your Profane instance with a custom word list by supplying an object with word definitions:
+
+```js
+const profane = new Profane({
+  words: {
+    happy: ['inappropriate'],
+    awesome: ['elated'],
+  },
+});
+
+profane.check('Mr. Happy is awesome'); // true
+profane.getCategoryFrequencies('Mr. Happy is awesome'); // {inappropriate: 1, elated: 1}
+```
+
+You can receive a _copy_ of the word list through the `getWordList()` function:
+
+```js
+import {getWordList} from '@cnakazawa/profane';
+
+getWordList(); // Record<string, ReadonlyArray<string>>
+```
+
+### `normalize?: boolean`
+
+Determines whether to normalize [Leet](https://en.wikipedia.org/wiki/Leet) or not. _Defaults to `true`'._
+
+```js
+new Profane({normalize: false}).check('H3ll'); // false
+new Profane({normalize: true}).check('H3ll'); // true
+```
+
+### `wholeWordsOnly?: boolean`
+
+Whether to match only on whole words or not. _Defaults to `false`'._
+
+```js
+new Profane({wholeWordsOnly: false}).check('shell'); // true
+new Profane({wholeWordsOnly: true}).check('shell'); // false
+```
+
+## Updates to the word list
+
+The default word list was lifted from [Swearjar](https://github.com/raymondjavaxx/swearjar-node) and may be out-of-date. Please feel free to send Pull Requests with new and updated definitions.
