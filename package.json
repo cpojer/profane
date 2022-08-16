@@ -30,7 +30,7 @@
     "vitest": "^0.18.1"
   },
   "scripts": {
-    "build": "mkdir -p lib && rm lib/* && tsc --declaration --emitDeclarationOnly --noEmit false && esbuild --target=node18 --format=cjs --platform=node --outfile=lib/profane.js --bundle ./src/profane.js",
+    "build": "mkdir -p lib && rm lib/*; tsc --declaration --emitDeclarationOnly --noEmit false && esbuild --target=node18 --format=cjs --platform=node --outfile=lib/profane.js --bundle ./src/profane.js",
     "test": "tsc && vitest"
   }
 }
