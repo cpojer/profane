@@ -1,6 +1,6 @@
 {
   "name": "@cnakazawa/profane",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Christoph Nakazawa <christoph.pojer@gmail.com>",
   "description": "Zero dependency profanity detector.",
   "repository": {
