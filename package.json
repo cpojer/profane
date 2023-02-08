@@ -5,7 +5,7 @@
   "description": "Zero dependency profanity detector.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cnakazawa/profane.git"
+    "url": "https://github.com/cpojer/profane.git"
   },
   "license": "MIT",
   "main": "lib/profane.js",
@@ -24,10 +24,10 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "esbuild": "^0.17.6",
     "escape-string-regexp": "^5.0.0",
-    "esbuild": "^0.14.49",
-    "typescript": "^4.7.4",
-    "vitest": "^0.18.1"
+    "typescript": "^4.9.5",
+    "vitest": "^0.28.4"
   },
   "scripts": {
     "build": "mkdir -p lib && rm lib/*; tsc --declaration --emitDeclarationOnly --noEmit false && esbuild --target=node18 --format=cjs --platform=node --outfile=lib/profane.js --bundle ./src/profane.js",
