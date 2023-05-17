@@ -1,6 +1,6 @@
 {
   "name": "@nkzw/profane",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "author": "Christoph Nakazawa <christoph.pojer@gmail.com>",
   "description": "Zero dependency profanity detector.",
   "repository": {
@@ -8,7 +8,8 @@
     "url": "https://github.com/cpojer/profane.git"
   },
   "license": "MIT",
-  "main": "lib/profane.js",
+  "type": "module",
+  "exports": "./lib/profane.js",
   "keywords": [
     "badwords",
     "clean",
@@ -24,13 +25,13 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "esbuild": "^0.17.6",
+    "esbuild": "^0.17.19",
     "escape-string-regexp": "^5.0.0",
-    "typescript": "^4.9.5",
-    "vitest": "^0.28.4"
+    "typescript": "^5.0.0",
+    "vitest": "^0.31.0"
   },
   "scripts": {
-    "build": "mkdir -p lib && rm lib/*; tsc --declaration --emitDeclarationOnly --noEmit false && esbuild --target=node18 --format=cjs --platform=node --outfile=lib/profane.js --bundle ./src/profane.js",
+    "build": "mkdir -p lib && rm lib/*; tsc --declaration --emitDeclarationOnly --noEmit false && esbuild --target=node18 --format=esm --platform=node --outfile=lib/profane.js --bundle ./src/profane.js",
     "test": "tsc && vitest"
   }
 }
