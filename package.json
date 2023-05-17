@@ -1,6 +1,6 @@
 {
   "name": "@nkzw/profane",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "Christoph Nakazawa <christoph.pojer@gmail.com>",
   "description": "Zero dependency profanity detector.",
   "repository": {
@@ -10,6 +10,7 @@
   "license": "MIT",
   "type": "module",
   "exports": "./lib/profane.js",
+  "main": "lib/profane.js",
   "keywords": [
     "badwords",
     "clean",
