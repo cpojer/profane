@@ -1,4 +1,4 @@
-# @cnakazawa/profane
+# @nkzw/profane
 
 Zero dependency profanity detector based on [Swearjar](https://github.com/raymondjavaxx/swearjar-node) and [Profane](https://github.com/willynilly/profane).
 
@@ -7,7 +7,7 @@ _Note: Some examples may contain offensive language for illustration purposes._
 ## install
 
 ```
-npm install @cnakazawa/profane
+npm install @nkzw/profane
 ```
 
 ## Usage
@@ -94,7 +94,7 @@ profane.getCategoryFrequencies('Mr. Happy is awesome'); // {inappropriate: 1, el
 You can receive a _copy_ of the word list through the `getWordList()` function:
 
 ```js
-import {getWordList} from '@cnakazawa/profane';
+import { getWordList } from '@nkzw/profane';
 
 getWordList(); // Record<string, ReadonlyArray<string>>
 ```
@@ -104,8 +104,8 @@ getWordList(); // Record<string, ReadonlyArray<string>>
 Determines whether to normalize [Leet](https://en.wikipedia.org/wiki/Leet) or not. _Defaults to `true`'._
 
 ```js
-new Profane({normalize: false}).check('H3ll'); // false
-new Profane({normalize: true}).check('H3ll'); // true
+new Profane({ normalize: false }).check('H3ll'); // false
+new Profane({ normalize: true }).check('H3ll'); // true
 ```
 
 ### `wholeWordsOnly?: boolean`
@@ -113,8 +113,8 @@ new Profane({normalize: true}).check('H3ll'); // true
 Whether to match only on whole words or not. _Defaults to `false`'._
 
 ```js
-new Profane({wholeWordsOnly: false}).check('shell'); // true
-new Profane({wholeWordsOnly: true}).check('shell'); // false
+new Profane({ wholeWordsOnly: false }).check('shell'); // true
+new Profane({ wholeWordsOnly: true }).check('shell'); // false
 ```
 
 ## Updates to the word list
