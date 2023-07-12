@@ -4,7 +4,7 @@ Zero dependency profanity detector based on [Swearjar](https://github.com/raymon
 
 _Note: Some examples may contain offensive language for illustration purposes._
 
-## install
+## Installation
 
 ```
 npm install @nkzw/profane
